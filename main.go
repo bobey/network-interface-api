@@ -4,9 +4,15 @@ import (
     "fmt"
     "log"
     "net/http"
+	"encoding/json"
 
     "github.com/gorilla/mux"
 )
+
+type NetworkInterface struct {
+    Name      string `json:"name"`
+    PublicIp  string `json:"public_ip"`
+}
 
 func main() {
     router := mux.NewRouter().StrictSlash(true)
@@ -23,5 +29,11 @@ func Index(w http.ResponseWriter, r *http.Request) {
 func GetNetworkInterface(w http.ResponseWriter, r *http.Request) {
     vars := mux.Vars(r)
     interfaceName := vars["interfaceName"]
-    fmt.Fprintln(w, "Interface name:", interfaceName)
+
+    networkInterface := NetworkInterface{
+        Name: interfaceName,
+        PublicIp: "8.8.8.8",
+    }
+
+    json.NewEncoder(w).Encode(networkInterface)
 }
