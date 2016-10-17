@@ -1,39 +1,40 @@
 package main
 
 import (
-    "fmt"
-    "log"
-    "net/http"
 	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+	"os/exec"
 
-    "github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 )
 
 type NetworkInterface struct {
-    Name      string `json:"name"`
-    PublicIp  string `json:"public_ip"`
+	Name     string `json:"name"`
+	PublicIp string `json:"public_ip"`
 }
 
 func main() {
-    router := mux.NewRouter().StrictSlash(true)
-    router.HandleFunc("/", Index)
-    router.HandleFunc("/interface/{interfaceName}", GetNetworkInterface)
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/", Index)
+	router.HandleFunc("/interface/{interfaceName}", GetNetworkInterface)
 
-    log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintln(w, "This is a network interface API. Or, is it?!")
+	fmt.Fprintln(w, "This is a network interface API. Or, is it?!")
 }
 
 func GetNetworkInterface(w http.ResponseWriter, r *http.Request) {
-    vars := mux.Vars(r)
-    interfaceName := vars["interfaceName"]
+	vars := mux.Vars(r)
+	interfaceName := vars["interfaceName"]
 
-    networkInterface := NetworkInterface{
-        Name: interfaceName,
-        PublicIp: "8.8.8.8",
-    }
+	networkInterface := NetworkInterface{
+		Name:     interfaceName,
+		PublicIp: "8.8.8.8",
+	}
 
-    json.NewEncoder(w).Encode(networkInterface)
+	json.NewEncoder(w).Encode(networkInterface)
 }
