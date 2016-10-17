@@ -38,3 +38,11 @@ func GetNetworkInterface(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(networkInterface)
 }
+
+func Ifup(interfaceName string) {
+        exec.Command("sudo", "ifup", interfaceName).Run()
+}
+
+func Ifdown(interfaceName string) {
+        exec.Command("sudo", "ifdown", interfaceName).Run()
+}
