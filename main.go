@@ -56,7 +56,7 @@ func GetNetworkInterfacePublicIp(interfaceName string) string {
 		cmdOut []byte
 		err    error
 		ipifyResult struct {
-			Ip  string         `json:"ip"`
+			Ip string `json:"ip"`
 		}
 	)
 
