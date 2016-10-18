@@ -19,8 +19,20 @@ type NetworkInterface struct {
 
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
+
 	router.HandleFunc("/", Index)
-	router.HandleFunc("/interface/{interfaceName}", GetNetworkInterface)
+
+	router.
+		HandleFunc("/interface/{interfaceName}", GetNetworkInterface).
+		Methods("GET")
+
+	router.
+		HandleFunc("/interface/{interfaceName}", PostNetworkInterface).
+		Methods("POST")
+
+	router.
+		HandleFunc("/interface/{interfaceName}", DeleteNetworkInterface).
+		Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
@@ -43,6 +55,20 @@ func GetNetworkInterface(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(networkInterface)
 }
 
+func DeleteNetworkInterface(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	interfaceName := vars["interfaceName"]
+
+	Ifdown(interfaceName)
+}
+
+func PostNetworkInterface(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	interfaceName := vars["interfaceName"]
+
+	Ifup(interfaceName)
+}
+
 func Ifup(interfaceName string) {
         exec.Command("sudo", "ifup", interfaceName).Run()
 }
@@ -63,6 +89,7 @@ func GetNetworkInterfacePublicIp(interfaceName string) string {
 	if cmdOut, err = exec.Command("curl", "--interface", interfaceName, "https://api.ipify.org?format=json").Output(); err != nil {
 		fmt.Fprintln(os.Stderr, "There was an error running curl --interface command: ", err)
 	}
+
 	json.NewDecoder(bytes.NewBuffer(cmdOut)).Decode(&ipifyResult)
 
 	return ipifyResult.Ip
